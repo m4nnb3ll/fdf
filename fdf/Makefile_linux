@@ -1,0 +1,40 @@
+NAME		:= fdf
+CFLAGS		:= -Wextra -Wall -Werror -Ofast
+LIBMLX		:= ~/mac/MLX42
+BUILD_DIR	:= build
+HEADERS		:= -I ./include -I $(LIBMLX)/include
+LIBS		:= $(LIBMLX)/$(BUILD_DIR)/libmlx42.a -lglfw -ldl -lm libft.a
+
+SRCS		:= main.c fdf_utils/error.c fdf_utils/ft_get_map.c fdf_utils/fxs_color.c fdf_utils/fxs_free_map.c
+OBJS		:= ${SRCS:.c=.o}
+
+#COLORS
+RED = \033[0;31m
+GREEN = \033[0;32m
+YELLOW = \033[0;33m
+NC = \033[0m
+
+all: $(NAME)
+
+%.o: %.c
+	@$(CC) $(CFLAGS) -g -o $@ -c $< $(HEADERS) && printf "Compiling: $(notdir $<)\n"
+
+libft.a:
+	@make bonus -C libft/
+	@cp libft/libft.a .
+	@make fclean -C libft/
+	@echo "$(GREEN)libft ✓$(NC)"
+
+$(NAME): $(OBJS) libft.a
+	@$(CC) $(OBJS) $(FRAMEWORKS) $(LIBS) $(HEADERS) -o $(NAME)
+	@echo "$(GREEN)Done ✓$(NC)"
+
+clean:
+	@rm -f $(OBJS) libft.a
+
+fclean: clean
+	@rm -f $(NAME)
+
+re: clean all
+
+.PHONY: all, clean, fclean, re
